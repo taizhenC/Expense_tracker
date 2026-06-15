@@ -1,0 +1,188 @@
+/* ============ BASIC RESET ============ */
+/* "*" means "every element". This removes the browser's default spacing
+   so our layout starts from a clean slate. border-box makes width include
+   padding (easier to reason about). */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, Arial, sans-serif; /* clean default font */
+  background: #f4f5f7;
+  color: #222;
+  line-height: 1.5;
+}
+
+/* ============ PAGE WRAPPER ============ */
+/* Centers the app and keeps it from getting too wide on big screens. */
+.container {
+  max-width: 640px;
+  margin: 32px auto;     /* top/bottom 32px, left/right auto = centered */
+  padding: 24px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+}
+
+/* ============ FORM ============ */
+/* Each input + its label sits in a .field. Stack them vertically. */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+input,
+select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2d6cdf;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+button:hover {
+  background: #2459bb;
+}
+
+/* A disabled button (used while fetching) looks greyed out. */
+button:disabled {
+  background: #9bb4e0;
+  cursor: not-allowed;
+}
+
+/* ============ ERROR MESSAGE ============ */
+/* Red text. Only has spacing when it actually contains a message. */
+.error {
+  color: #c0392b;
+  font-size: 0.9rem;
+  min-height: 1.2em;   /* reserves space so layout doesn't jump */
+  margin: 6px 0;
+}
+
+/* ============ CONTROLS (filter + sort) ============ */
+/* Put the two dropdowns side by side. */
+.controls {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.controls .field {
+  flex: 1;             /* each takes half the width */
+  margin-bottom: 0;
+}
+
+/* ============ EXPENSE LIST ============ */
+.expense-list {
+  list-style: none;    /* remove bullet points */
+  margin: 16px 0;
+}
+
+/* One expense row: spread the pieces across the line. */
+.expense-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.expense-list .desc {
+  font-weight: 600;
+}
+
+.expense-list .meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.expense-list .amount {
+  font-weight: 600;
+  margin-left: auto;   /* push amount + delete to the right */
+}
+
+/* Make the delete button small and red so it reads as "remove". */
+.expense-list .delete-btn {
+  background: #c0392b;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+.expense-list .delete-btn:hover {
+  background: #a93226;
+}
+
+/* ============ EMPTY STATE ============ */
+/* Friendly centered message when there are no rows to show. */
+.empty {
+  text-align: center;
+  color: #888;
+  padding: 24px;
+  font-style: italic;
+}
+
+/* ============ TOTALS ============ */
+.totals {
+  border-top: 2px solid #eee;
+  padding-top: 16px;
+}
+
+.totals .overall {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;     /* wrap to next line on small screens */
+  margin: 8px 0;
+}
+
+#converted {
+  color: #2459bb;
+}
+
+/* The converted span shows an error message in red when fetch fails. */
+#converted.error-text {
+  color: #c0392b;
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.category-totals {
+  font-size: 0.9rem;
+  color: #444;
+  margin-top: 8px;
+}
+
+.category-totals div {
+  display: flex;
+  justify-content: space-between;
+  max-width: 240px;
+  padding: 2px 0;
+}
