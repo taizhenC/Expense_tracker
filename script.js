@@ -23,6 +23,11 @@ const countEl = document.getElementById("count");
 const totalEl = document.getElementById("total");
 const categoryTotalsEl = document.getElementById("category-totals");
 
+const filterInput = document.getElementById("filter");
+const sortInput = document.getElementById("sort");
+const convertBtn = document.getElementById("convert-btn");
+const convertedEl = document.getElementById("converted");
+
 // ============================================================
 // SMALL HELPER — format a number as money like "$12.50"
 // ============================================================
@@ -36,8 +41,28 @@ function formatCurrency(amount) {
 // ============================================================
 // This is the heart of the app. We call it after EVERY change.
 function render() {
-  // The list we actually show. (Later we'll filter/sort here.)
-  const shown = expenses;
+  // Start from the full array, then narrow/reorder it for display.
+  // We never change "expenses" itself here — we build a separate "shown" list.
+
+  // ---- 1) FILTER by the chosen category ----
+  const selectedCategory = filterInput.value; // "all" or a category name
+  let shown = expenses.filter(function (expense) {
+    // "all" keeps everything; otherwise keep only matching categories.
+    return selectedCategory === "all" || expense.category === selectedCategory;
+  });
+
+  // ---- 2) SORT by the chosen option ----
+  // sort() compares two items (a, b). Return negative = a first,
+  // positive = b first. We copy first with slice() so we don't mutate.
+  const sortBy = sortInput.value; // e.g. "date-desc"
+  shown = shown.slice().sort(function (a, b) {
+    if (sortBy === "amount-asc") return a.amount - b.amount;
+    if (sortBy === "amount-desc") return b.amount - a.amount;
+    // Dates are strings like "2026-06-14". For YYYY-MM-DD, comparing the
+    // strings with < / > also sorts them chronologically.
+    if (sortBy === "date-asc") return a.date < b.date ? -1 : 1;
+    return a.date > b.date ? -1 : 1; // "date-desc" (default)
+  });
 
   // ---- Empty state: nothing to show? Show a friendly message. ----
   list.innerHTML = ""; // wipe whatever was there before
@@ -135,6 +160,7 @@ function deleteExpense(id) {
   expenses = expenses.filter(function (expense) {
     return expense.id !== id;
   });
+  save();   // remember the change
   render();
 }
 
@@ -178,8 +204,9 @@ form.addEventListener("submit", function (event) {
     date: date,
   };
 
-  // Add it to the array (our source of truth), then redraw.
+  // Add it to the array (our source of truth), save, then redraw.
   expenses.push(newExpense);
+  save();
   render();
 
   // Reset the form and put the date back to today for the next entry.
@@ -196,6 +223,75 @@ function clearError() {
 }
 
 // ============================================================
+// FILTER + SORT — just trigger a redraw
+// ============================================================
+// render() already reads the dropdown values, so these listeners only
+// need to call render(). No duplicated logic.
+filterInput.addEventListener("change", render);
+sortInput.addEventListener("change", render);
+
+// ============================================================
+// PERSISTENCE — save to / load from localStorage
+// ============================================================
+// localStorage can only store strings, so we convert to/from JSON text.
+const STORAGE_KEY = "expenses";
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    // Only accept it if it's actually an array; otherwise start empty.
+    expenses = Array.isArray(data) ? data : [];
+  } catch (error) {
+    // Corrupt/unparseable data — don't crash, just start empty.
+    expenses = [];
+  }
+}
+
+// ============================================================
+// CONVERT TO EUR — fetch a live exchange rate (async/await)
+// ============================================================
+convertBtn.addEventListener("click", async function () {
+  // The amount we want to convert = the current overall (filtered) total.
+  // We re-read it from the page text we already rendered.
+  const usdTotal = parseFloat(totalEl.textContent.replace("$", ""));
+
+  // ---- Loading state ----
+  convertBtn.disabled = true;
+  convertBtn.textContent = "Converting...";
+  convertedEl.classList.remove("error-text");
+  convertedEl.textContent = "";
+
+  try {
+    // await pauses here until the network reply comes back.
+    const response = await fetch("https://open.er-api.com/v6/latest/USD");
+
+    // A bad HTTP response (e.g. 500) does NOT throw on its own — check it.
+    if (!response.ok) {
+      throw new Error("Bad response from server");
+    }
+
+    const data = await response.json(); // parse the JSON body
+    const rate = data.rates.EUR;        // the USD -> EUR rate
+    const eurTotal = usdTotal * rate;
+
+    // Show the converted amount next to the USD total.
+    convertedEl.textContent = "≈ €" + eurTotal.toFixed(2);
+  } catch (error) {
+    // Network failure or bad response — show it, don't hide it.
+    convertedEl.classList.add("error-text");
+    convertedEl.textContent = "Could not get exchange rate. Try again.";
+  } finally {
+    // Always runs — restore the button whether we succeeded or failed.
+    convertBtn.disabled = false;
+    convertBtn.textContent = "Convert to EUR";
+  }
+});
+
+// ============================================================
 // STARTUP — runs once when the page loads
 // ============================================================
 function setDateToToday() {
@@ -204,5 +300,6 @@ function setDateToToday() {
   dateInput.value = new Date().toISOString().slice(0, 10);
 }
 
+load();          // bring back saved expenses (if any)
 setDateToToday();
-render(); // draw the initial (empty) state
+render();         // draw the screen from whatever we loaded
