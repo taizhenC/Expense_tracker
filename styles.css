@@ -1,7 +1,3 @@
-/* ============ BASIC RESET ============ */
-/* "*" means "every element". This removes the browser's default spacing
-   so our layout starts from a clean slate. border-box makes width include
-   padding (easier to reason about). */
 * {
   margin: 0;
   padding: 0;
@@ -9,17 +5,15 @@
 }
 
 body {
-  font-family: system-ui, Arial, sans-serif; /* clean default font */
+  font-family: system-ui, Arial, sans-serif;
   background: #f4f5f7;
   color: #222;
   line-height: 1.5;
 }
 
-/* ============ PAGE WRAPPER ============ */
-/* Centers the app and keeps it from getting too wide on big screens. */
 .container {
   max-width: 640px;
-  margin: 32px auto;     /* top/bottom 32px, left/right auto = centered */
+  margin: 32px auto;
   padding: 24px;
   background: #fff;
   border-radius: 10px;
@@ -31,8 +25,7 @@ h1 {
   font-size: 1.6rem;
 }
 
-/* ============ FORM ============ */
-/* Each input + its label sits in a .field. Stack them vertically. */
+/* Form */
 .field {
   display: flex;
   flex-direction: column;
@@ -67,23 +60,20 @@ button:hover {
   background: #2459bb;
 }
 
-/* A disabled button (used while fetching) looks greyed out. */
 button:disabled {
   background: #9bb4e0;
   cursor: not-allowed;
 }
 
-/* ============ ERROR MESSAGE ============ */
-/* Red text. Only has spacing when it actually contains a message. */
+/* Validation message */
 .error {
   color: #c0392b;
   font-size: 0.9rem;
-  min-height: 1.2em;   /* reserves space so layout doesn't jump */
+  min-height: 1.2em; /* reserve space so the layout doesn't jump */
   margin: 6px 0;
 }
 
-/* ============ CONTROLS (filter + sort) ============ */
-/* Put the two dropdowns side by side. */
+/* Filter + sort */
 .controls {
   display: flex;
   gap: 16px;
@@ -91,17 +81,16 @@ button:disabled {
 }
 
 .controls .field {
-  flex: 1;             /* each takes half the width */
+  flex: 1;
   margin-bottom: 0;
 }
 
-/* ============ EXPENSE LIST ============ */
+/* Expense list */
 .expense-list {
-  list-style: none;    /* remove bullet points */
+  list-style: none;
   margin: 16px 0;
 }
 
-/* One expense row: spread the pieces across the line. */
 .expense-list li {
   display: flex;
   align-items: center;
@@ -124,10 +113,9 @@ button:disabled {
 
 .expense-list .amount {
   font-weight: 600;
-  margin-left: auto;   /* push amount + delete to the right */
+  margin-left: auto; /* push amount + delete to the right */
 }
 
-/* Make the delete button small and red so it reads as "remove". */
 .expense-list .delete-btn {
   background: #c0392b;
   padding: 4px 10px;
@@ -138,8 +126,7 @@ button:disabled {
   background: #a93226;
 }
 
-/* ============ EMPTY STATE ============ */
-/* Friendly centered message when there are no rows to show. */
+/* Empty state */
 .empty {
   text-align: center;
   color: #888;
@@ -147,7 +134,7 @@ button:disabled {
   font-style: italic;
 }
 
-/* ============ TOTALS ============ */
+/* Totals */
 .totals {
   border-top: 2px solid #eee;
   padding-top: 16px;
@@ -159,7 +146,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;     /* wrap to next line on small screens */
+  flex-wrap: wrap;
   margin: 8px 0;
 }
 
@@ -167,7 +154,6 @@ button:disabled {
   color: #2459bb;
 }
 
-/* The converted span shows an error message in red when fetch fails. */
 #converted.error-text {
   color: #c0392b;
   font-weight: 400;
